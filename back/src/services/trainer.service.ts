@@ -32,4 +32,33 @@ export class TrainerService {
   async findAll(): Promise<Trainer[] | []> {
     return this.prisma.trainer.findMany();
   }
+
+  async getPokemons(id: string): Promise<any> {
+    const pokemonData = await this.prisma.pokemonOnTrainer.findMany({
+      where: {
+        trainerId: id
+      },
+      select: {
+        id: true,
+        level: true,
+        pokemon: true
+      }
+    })
+
+    return pokemonData
+  }
+  
+  async addPokemons(data: Prisma.PokemonOnTrainerCreateManyInput): Promise<any> {
+    return this.prisma.pokemonOnTrainer.createMany({
+      data
+    })
+  }
+
+  async removePokemon(trainerId: string, pokemonId): Promise<any> {
+    return await this.prisma.pokemonOnTrainer.delete({
+      where: {
+        id: pokemonId,
+      }
+    })
+  }
 }

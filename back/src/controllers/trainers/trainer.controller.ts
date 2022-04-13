@@ -1,10 +1,9 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { Trainer as TrainerModel } from '@prisma/client';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { PokemonOnTrainer, Trainer as TrainerModel } from '@prisma/client';
 import { TrainerService } from 'src/services/trainer.service';
-
-@Controller('users')
-export class UserController {
-  constructor(private readonly trainerService: TrainerService) {}
+@Controller('trainers')
+export class TrainerController {
+  constructor(private readonly trainerService: TrainerService) { }
 
   @Get()
   findAll(): Promise<TrainerModel[] | []> {
@@ -24,10 +23,35 @@ export class UserController {
     return userData
   }
 
+  @Get('/:id/pokemons')
+  getPokemonsByUserId(@Param('id') id: string): Promise<any> {
+    const pokemons: any = this.trainerService.getPokemons(id);
+
+    return pokemons;
+  }
+
+  @Post('/:id/pokemons')
+  addPokemonsToUser(@Param('id') id: string, @Body() data: any): Promise<any> {
+    for (const pokemonData of data) {
+      pokemonData.trainerId = id
+    }
+    
+    const pokemons: any = this.trainerService.addPokemons(data);
+
+    return pokemons;
+  }
+
   @Post()
   create(@Body() body: TrainerModel): Promise<TrainerModel> {
     const userData = this.trainerService.createTrainer(body);
 
     return userData;
+  }
+
+  @Delete('/:trainerId/pokemons/:pokemonId')
+  delete(@Param('trainerId') trainerId: string, @Param('pokemonId') pokemonId: string): Promise<any> {
+    const removedData: any = this.trainerService.removePokemon(trainerId, pokemonId)
+
+    return removedData;
   }
 }

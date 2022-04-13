@@ -8,20 +8,28 @@ datasource db {
 }
 
 model Trainer {
-  id       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email    String    @unique
-  password String
-  name     String
-  pokemons Pokemon[]
+  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email            String             @unique
+  password         String
+  name             String
+  PokemonOnTrainer PokemonOnTrainer[]
 }
 
 model Pokemon {
-  id        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String
-  level     Int     @default(1)
-  trainerId String  @db.Uuid
+  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  number           Int                @default(autoincrement())
+  name             String             @unique
+  types            Type[]
+  PokemonOnTrainer PokemonOnTrainer[]
+}
+
+model PokemonOnTrainer {
+  id       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  trainerId String   @db.Uuid
   trainer   Trainer? @relation(fields: [trainerId], references: [id])
-  types     Type[]
+  level     Int      @default(1)
+  pokemon   Pokemon? @relation(fields: [pokemonId], references: [id])
+  pokemonId String   @db.Uuid
 }
 
 model Type {

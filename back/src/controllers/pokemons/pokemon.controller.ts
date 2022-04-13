@@ -13,16 +13,6 @@ export class PokemonController {
     return pokemons;
   }
 
-  @Get('users/:id')
-  getPokemonsByUserId(@Param('id') id: string): Promise<PokemonModel[] | []> {
-    const pokemons: Promise<PokemonModel[] | []> = this.pokemonService.pokemons({ where: {
-      trainerId: id
-      }
-     });
-
-    return pokemons;
-  }
-  
   @Post()
   create(@Body() body: PokemonModel): Promise<PokemonModel> {
     const postData = this.pokemonService.createPokemon(body);
