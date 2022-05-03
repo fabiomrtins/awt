@@ -12,24 +12,17 @@ model Trainer {
   email            String             @unique
   password         String
   name             String
-  PokemonOnTrainer PokemonOnTrainer[]
+  Pokemon          Pokemon[]
 }
 
 model Pokemon {
   id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   number           Int                @default(autoincrement())
-  name             String             @unique
+  name             String             
+  level            Int                @default(1)
   types            Type[]
-  PokemonOnTrainer PokemonOnTrainer[]
-}
-
-model PokemonOnTrainer {
-  id       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  trainerId String   @db.Uuid
-  trainer   Trainer? @relation(fields: [trainerId], references: [id])
-  level     Int      @default(1)
-  pokemon   Pokemon? @relation(fields: [pokemonId], references: [id])
-  pokemonId String   @db.Uuid
+  trainerId        String             @db.Uuid
+  trainer          Trainer?           @relation(fields: [trainerId], references: [id])
 }
 
 model Type {
