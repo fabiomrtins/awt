@@ -1,9 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { PokemonOnTrainer, Trainer as TrainerModel } from '@prisma/client';
+import { Trainer as TrainerModel } from '@prisma/client';
+import { PokemonService } from 'src/services/pokemon.service';
 import { TrainerService } from 'src/services/trainer.service';
 @Controller('trainers')
 export class TrainerController {
-  constructor(private readonly trainerService: TrainerService) { }
+  constructor(private readonly trainerService: TrainerService, private readonly pokemonService: PokemonService) { }
 
   @Get()
   findAll(): Promise<TrainerModel[] | []> {
@@ -30,16 +31,6 @@ export class TrainerController {
     return pokemons;
   }
 
-  @Post('/:id/pokemons')
-  addPokemonsToUser(@Param('id') id: string, @Body() data: any): Promise<any> {
-    for (const pokemonData of data) {
-      pokemonData.trainerId = id
-    }
-    
-    const pokemons: any = this.trainerService.addPokemons(data);
-
-    return pokemons;
-  }
 
   @Post()
   create(@Body() body: TrainerModel): Promise<TrainerModel> {
@@ -50,7 +41,9 @@ export class TrainerController {
 
   @Delete('/:trainerId/pokemons/:pokemonId')
   delete(@Param('trainerId') trainerId: string, @Param('pokemonId') pokemonId: string): Promise<any> {
-    const removedData: any = this.trainerService.removePokemon(trainerId, pokemonId)
+    const removedData: any = this.pokemonService.deletePokemon({
+      id: pokemonId
+    })
 
     return removedData;
   }

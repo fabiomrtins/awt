@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Delete } from '@nestjs/common';
 import { Pokemon as PokemonModel } from '@prisma/client';
 import { PokemonService } from '../../services/pokemon.service';
 
@@ -25,6 +25,19 @@ export class PokemonController {
     const updateData = this.pokemonService.updatePokemon({
       where: { id: id },
       data: body
+    })
+
+    return updateData
+  }
+
+  @Delete(':id/types/:typeId')
+  deleteType(@Param() params: {
+    id: string,
+    typeId: string
+  }): any {
+    const updateData = this.pokemonService.removeType({
+      where: { id: params.id },
+      typeId: params.typeId
     })
 
     return updateData
