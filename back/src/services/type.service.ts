@@ -12,6 +12,23 @@ export class TypeService {
     })
   }
 
+  async delete(id: Prisma.TypeWhereUniqueInput): Promise<Type> {
+    return this.prisma.type.delete({
+      where: id,
+    });
+  }
+
+  async updateType(params: {
+    where: Prisma.TypeWhereUniqueInput;
+    data: any;
+  }): Promise<Type> {
+    const { data, where } = params;
+    return this.prisma.type.update({
+      where: where,
+      data
+    });
+  }
+
   async findAll(): Promise<Type[] | null> {
     return await this.prisma.type.findMany()
   }

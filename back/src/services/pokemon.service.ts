@@ -6,9 +6,14 @@ import { Pokemon, Prisma } from '@prisma/client';
 export class PokemonService {
   constructor(private prisma: PrismaService) {}
 
-  async createPokemon(data: Prisma.PokemonCreateInput): Promise<Pokemon> {
+  async createPokemon(data: any): Promise<Pokemon> {
     return this.prisma.pokemon.create({
-      data,
+      data: {
+        ...data,
+        types: {
+          connect: data.types
+        }
+      }
     });
   }
 
@@ -31,18 +36,37 @@ export class PokemonService {
 
   async updatePokemon(params: {
     where: Prisma.PokemonWhereUniqueInput;
-    data: Prisma.PokemonUpdateInput;
+    data: any;
   }): Promise<Pokemon> {
     const { data, where } = params;
     return this.prisma.pokemon.update({
-      data,
-      where,
+      data: {
+        ...data,
+        types: {
+          connect: data.types
+        }
+      },
+      where
     });
   }
 
   async deletePokemon(where: Prisma.PokemonWhereUniqueInput): Promise<Pokemon> {
     return this.prisma.pokemon.delete({
       where,
+    });
+  }
+
+  async removeType(params: {
+    where: Prisma.PokemonWhereUniqueInput;
+    typeId: any;
+  }): Promise<Pokemon> {
+    return this.prisma.pokemon.update({
+      where: params.where,
+      data: {
+        types: {
+          delete: {id: params.typeId},
+        },
+      },
     });
   }
 
