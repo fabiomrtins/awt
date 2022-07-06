@@ -6,7 +6,7 @@ import { PrismaService } from "./prisma.service";
 export class TypeService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.TypeCreateInput): Promise<Type> {
+  async create(data: Prisma.TypeCreateWithoutPokemonsInput): Promise<Type> {
     return await this.prisma.type.create({
       data
     })

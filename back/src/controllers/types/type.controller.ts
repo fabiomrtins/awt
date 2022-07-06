@@ -6,7 +6,7 @@ export class TypeController {
   constructor(private readonly typeService: TypeService) {}
 
   @Get()
-  show(): Promise<Type[] | []> {
+  show(): Promise<Type[] | null> {
     return this.typeService.findAll()
   }
 
