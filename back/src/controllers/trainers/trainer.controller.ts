@@ -1,11 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Post, Res } from '@nestjs/common';
-import { PokemonOnTrainer, Trainer as TrainerModel } from '@prisma/client';
-import { TrainerService } from 'src/services/trainer.service';
-import * as jwt from 'jsonwebtoken'
-import * as argon2 from 'argon2'
+import { Trainer as TrainerModel } from '@prisma/client';
+import { TrainerService } from '../../services/trainer.service';
+import { PokemonService } from '../../services/pokemon.service';
 import { Response } from 'express';
-import { env } from 'process';
-
 @Controller('trainers')
 export class TrainerController {
   constructor(private readonly trainerService: TrainerService, private readonly pokemonService: PokemonService) { }
@@ -18,37 +15,14 @@ export class TrainerController {
   }
 
   @Post("login")
-  async login(@Body() body: any, @Res() res: Response): Promise<TrainerModel[] | Response> {
-    try {
-      const userData: TrainerModel[] = await this.trainerService.trainers({
-        where: {
-          email: body.email,
-        }
-      })
-      
-      if (!(userData.length > 0)) {
-        return res.status(400).send({
-          message: "Usuário ou senha incorretos."
-        })
+  login(@Body() body: any): Promise<TrainerModel[]> {
+    const userData: Promise<TrainerModel[]> = this.trainerService.trainers({
+      where: {
+        email: body.email
       }
+    })
 
-      const userIsValid = await argon2.verify(userData[0].password, body.password)
-
-      if (!userIsValid) {
-        return res.status(400).send({
-          message: "Usuário ou senha incorretos."
-        })
-      }
-      
-      return res.send({
-        token: jwt.sign({ id: userData[0].id }, env.JWT_SECRET)
-      })
-    } catch (error) {
-      console.log(error)
-      return res.status(500).send({
-        message: "Ocorreu um erro interno no servidor."
-      })
-    }
+    return userData
   }
 
   @Get('/:id/pokemons')
@@ -60,21 +34,17 @@ export class TrainerController {
 
 
   @Post()
-  async create(@Body() body: TrainerModel, res: Response): Promise<Response> {
-    try {
-      const userData = await this.trainerService.createTrainer({
-        ...body,
-        password: await argon2.hash(body.password)
-      });
-  
-      return res.send({
-        message: "Usuário registrado com sucesso."
-      });
-    } catch (error) {
-      return res.status(500).send({
-        message: "Ocorreu um erro interno no servidor."
+  create(@Body() body: TrainerModel, @Res() res: Response): Promise<TrainerModel> | Response {
+
+    if(!body.email) {
+      return res.status(404).send({
+        message: "Email inválido."
       })
     }
+    
+    const userData = this.trainerService.createTrainer(body);
+
+    return res.send(userData);
   }
 
   @Delete('/:trainerId/pokemons/:pokemonId')
